@@ -104,7 +104,8 @@ RUN set -e \
 # add sample (and unsecured!) tomcat users file
 
 COPY tomcat-users.xml conf/
-COPY context.xml conf/
+RUN mkdir conf/Catalina/localhost
+COPY manager.xml conf/Catalina/localhost
 
 EXPOSE 8080
 CMD ["catalina.sh", "run"]
