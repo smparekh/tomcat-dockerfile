@@ -121,7 +121,7 @@ RUN mvn -v
 
 # Ideally we should grab the built .war file from a repository instead of building locally
 # Version of .war file should be controlled via environment variable passed into the Dockerfile
-RUN apt-get install -y --no-install-recommends git
+#RUN apt-get install -y --no-install-recommends git
 ENV APP_DIR /opt/camel
 RUN mkdir -p "$APP_DIR"
 WORKDIR $APP_DIR
