@@ -107,5 +107,32 @@ COPY tomcat-users.xml conf/
 RUN mkdir -p conf/Catalina/localhost
 COPY manager.xml conf/Catalina/localhost
 
+# Install maven 3.3.9
+ENV MAVEN_VERSION 3.3.9
+
+RUN mkdir -p /usr/share/maven \
+  && curl -fsSL http://apache.osuosl.org/maven/maven-3/$MAVEN_VERSION/binaries/apache-maven-$MAVEN_VERSION-bin.tar.gz \
+    | tar -xzC /usr/share/maven --strip-components=1 \
+  && ln -s /usr/share/maven/bin/mvn /usr/bin/mvn
+
+ENV MAVEN_HOME /usr/share/maven
+
+RUN mvn -v
+
+# Ideally we should grab the built .war file from a repository instead of building locally
+# Version of .war file should be controlled via environment variable passed into the Dockerfile
+RUN apt-get install -y --no-install-recommends git
+ENV APP_DIR /opt/camel
+RUN mkdir -p "$APP_DIR"
+WORKDIR $APP_DIR
+RUN git clone https://github.com/smparekh/camel-example-servlet-rest-tomcat.git
+RUN cd camel-example-servlet-rest-tomcat
+RUN mvn clean install
+RUN cp target/providerservice.war /usr/local/tomcat/webapps
+
+WORKDIR $CATALINA_HOME
+
+
+# We are ready to start our apps
 EXPOSE 8080
 CMD ["catalina.sh", "run"]
